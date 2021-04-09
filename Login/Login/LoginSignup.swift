@@ -2,7 +2,8 @@
 //  LoginSignup.swift
 //  Login
 //
-//  LoginSignup does exactly what is says, handles all user interaction with logging into the app or registering them
+//  LoginSignup does exactly what is says, handles all user interaction with logging into the app or
+//  registering them
 //  if they are new. Google Firbase is used to manage the workflow for login and registration.
 //
 //  Created by Travis Walter on 11/30/20.
@@ -12,6 +13,7 @@ import SwiftUI
 import Firebase
 import GoogleSignIn
 
+// View struct for the Login / Signup page, which is called by ContentView's navigation button
 struct LoginSignup: View {
     
     // State variable for the status of the login process
@@ -19,15 +21,16 @@ struct LoginSignup: View {
     // State variable for the about you status of the registration process
     @State var about = UserDefaults.standard.value(forKey: "about") as? Bool ?? false
     
+    // Body of the view
     var body: some View {
         // This VStack loads different views depending on the state of the States above
-        // If the user goes through the registration workflow, the about state is set to true which will load the AboutYou view
+        // If the user goes through the registration workflow, the "about" State is set to true which will load the AboutYou view
         // which allows the app to further populate the realtime database for the user.
         //
-        // If the about state is set to false and the user is logged in, the "status" state will be equal to true, which will load
+        // If the "about" State is set to false and the user is logged in, the "status" State will be equal to true, which will load
         // the Home view.
         //
-        // If the about state is set to false and the user is not logged in, the "status" state will be equal to false, which will
+        // If the "about" State is set to false and the user is not logged in, the "status" State will be equal to false, which will
         // load the Login view.
         VStack {
             if !about {
@@ -41,12 +44,14 @@ struct LoginSignup: View {
             }
         }.animation(.spring())
         .onAppear {
+            // Change state of "status" state
             NotificationCenter.default.addObserver(forName: NSNotification.Name("statusChange"), object: nil, queue: .main) {
                 (_) in
                 
                 let status = UserDefaults.standard.value(forKey: "status") as? Bool ?? false
                 self.status = status
             }
+            // Change state of "about" state
             NotificationCenter.default.addObserver(forName: NSNotification.Name("aboutChange"), object: nil, queue: .main) {
                 (_) in
                 
@@ -143,6 +148,7 @@ struct Login: View {
     }
 }
 
+// This struct defines the button view of the login / signup page, which includes the Sign up button
 struct BottomView: View {
     @State var show = false
     
@@ -166,7 +172,9 @@ struct BottomView: View {
     }
 }
 
+// This struct defines the signup view flow and calls the function signUpWithEmail to accomplish this
 struct Signup: View {
+    // State definitions for Signup work flow
     @State var user = ""
     @State var pass = ""
     @State var msg = ""
@@ -203,11 +211,13 @@ struct Signup: View {
                 
                 Button(action: {
                     
+                    // Function call to signUpWithEmail, which adds the user name and password to firebase
                     signUpWithEmail(email: self.user, password: self.pass) { (verified, status) in
                         if !verified {
                             self.msg = status
                             self.alert.toggle()
                         } else {
+                            // Set "about" state to true so that the AboutYou view will be displayed
                             UserDefaults.standard.set(true, forKey: "about")
                             self.show.toggle()
                             NotificationCenter.default.post(name: Notification.Name("aboutChange"), object: nil)
@@ -243,7 +253,10 @@ struct Signup: View {
     }
 }
 
+// This struct defines the view flow for forgot password functionality
+// which is defined in the resetPasswordWithEmail function
 struct ForgotPass: View {
+    // State definitions for Signup work flow
     @State var user = ""
     @State var msg = ""
     @State var alert = false
@@ -269,7 +282,7 @@ struct ForgotPass: View {
             }.padding(.horizontal, 6)
             
             Button(action: {
-                
+                // Function call to resetPasswordWithEmail that init the workflow in firebase to reset the users password
                 resetPasswordWithEmail(email: self.user)
                 
             }) {
@@ -314,6 +327,7 @@ struct ForgotPass: View {
 //    }
 //}
 
+// This function handles the workflow for signup through firebase and only takes an email and a password to create the user.
 func signUpWithEmail(email: String, password: String, completion: @escaping (Bool,String) -> Void) {
     Auth.auth().createUser(withEmail: email, password: password) { (res, err) in
         if err != nil {
@@ -325,6 +339,7 @@ func signUpWithEmail(email: String, password: String, completion: @escaping (Boo
     }
 }
 
+// This function handles the workflow for signin through firebase and only takes an email and a password to authenticate the user.
 func signInWithEmail(email: String, password: String, completion: @escaping (Bool,String) -> Void) {
     Auth.auth().signIn(withEmail: email, password: password) { (res, err) in
         if err != nil {
@@ -336,6 +351,7 @@ func signInWithEmail(email: String, password: String, completion: @escaping (Boo
     }
 }
 
+// This function handles the reseting of the user's password through firebase and only takes a user's email
 func resetPasswordWithEmail(email: String) {
     Auth.auth().sendPasswordReset(withEmail: email) { err in
         if err != nil {

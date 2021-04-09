@@ -9,20 +9,28 @@
 
 import SwiftUI
 
+// View for the landing page at the start of the page.
 struct ContentView: View {
     var body: some View {
+        // Navigationg view for navigation buttons and back buttons
         NavigationView {
+            // ZStack for image and text layout on the view
             ZStack {
+                // Background image
                 Image("CityBackground")
                     .resizable()
                     .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
+                // VStack for the Logo and the Get Started button
                 VStack {
+                    // Logo placeholder
                     Text("Logo")
                         .font(.largeTitle)
                         .fontWeight(.medium)
                         
                     Spacer()
+                    
+                    // Navigation button to the login/signup page, with the nav bar hidden.
                     NavigationLink(destination: LoginSignup()) {
                         Text("Get Started!")
                             .frame(minWidth: 0, maxWidth: 300)
@@ -40,6 +48,7 @@ struct ContentView: View {
     }
 }
 
+// Preview content runner
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
